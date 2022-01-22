@@ -1,7 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
+
 using System.Collections.Generic;
 using Locadora.WebAPI.Models;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
+using Locadora.WebAPI.Data.Interfaces;
 
 namespace Locadora.WebAPI.Controllers
 {
@@ -9,43 +11,67 @@ namespace Locadora.WebAPI.Controllers
     [Route("api/[controller]")]
     public class ClienteController : ControllerBase
     {
-        public ClienteController() { }
+        private readonly IClienteRepository _repository;
+        public ClienteController(IClienteRepository repository) 
+        {
+            _repository = repository;
+        }
 
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok();
+            var clientes = _repository.GetAllClientes();
+            return Ok(clientes);
         }
-        
+
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            return Ok();
+            var cliente = _repository.GetClienteById(id);
+            return Ok(cliente);
         }
 
         [HttpPost]
         public IActionResult Post(Cliente cliente)
         {
-            return Ok(cliente);
+            try
+            {
+                _repository.Add(cliente);
+                return Ok();
+            }
+            catch(Exception error)
+            {
+                return BadRequest(error);
+            }
         }
 
         [HttpPut]
         public IActionResult Put(int id, Cliente cliente)
         {
-            return Ok(cliente);
-        }
-
-        [HttpPatch]
-        public IActionResult Patch(int id, Cliente cliente)
-        {
-            return Ok(cliente);
+            try
+            {
+                _repository.Update(cliente);
+                return Ok();
+            }
+            catch(Exception error)
+            {
+                return BadRequest(error);
+            }
         }
 
         [HttpDelete]
         public IActionResult Delete(int id)
         {
-            return Ok();
+            try
+            {
+                //_repository.Delete();
+                return Ok();
+            }
+            catch(Exception error)
+            {
+                return BadRequest(error);
+            }
         }
-        
+
     }
 }

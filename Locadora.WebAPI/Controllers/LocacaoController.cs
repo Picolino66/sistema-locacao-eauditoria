@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using Locadora.WebAPI.Models;
 using System.Linq;
+using Locadora.WebAPI.Data.Interfaces;
 
 namespace Locadora.WebAPI.Controllers
 {
@@ -9,45 +10,66 @@ namespace Locadora.WebAPI.Controllers
     [Route("api/[controller]")]
     public class LocacaoController : ControllerBase
     {
-        public LocacaoController()
+        private readonly ILocacaoRepository _repository;
+        public LocacaoController(ILocacaoRepository repository) 
         {
-            
+            _repository = repository;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok();
+            var locacoes = _repository.GetAllLocacoes();
+            return Ok(locacoes);
         }
         
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            return Ok();
+            var locacao = _repository.GetLocacaoById(id);
+            return Ok(locacao);
         }
 
         [HttpPost]
         public IActionResult Post(Locacao locacao)
         {
-            return Ok(locacao);
+            try
+            {
+                _repository.Add(locacao);
+                return Ok();
+            }
+            catch(Exception error)
+            {
+                return BadRequest(error);
+            }
         }
 
         [HttpPut]
         public IActionResult Put(int id, Locacao locacao)
         {
-            return Ok(locacao);
-        }
-
-        [HttpPatch]
-        public IActionResult Patch(int id, Locacao locacao)
-        {
-            return Ok(locacao);
+            try
+            {
+                _repository.Update(locacao);
+                return Ok();
+            }
+            catch(Exception error)
+            {
+                return BadRequest(error);
+            }
         }
 
         [HttpDelete]
         public IActionResult Delete(int id)
         {
-            return Ok();
+            try
+            {
+                //_repository.Delete();
+                return Ok();
+            }
+            catch(Exception error)
+            {
+                return BadRequest(error);
+            }
         }
     }
 }
